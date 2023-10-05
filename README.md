@@ -146,9 +146,12 @@ The `aicrowd.json` of each submission should contain the following content:
 {
   "challenge_id": "control-track-citylearn-challenge",
   "authors": ["your-aicrowd-username"],
+  "central_agent: "True", # or "False" - If you want to use non central agent. Remember to put "False" in quotes.
   "description": "(optional) description about your awesome agent",
 }
 ```
+
+
 
 This JSON is used to map your submission to the challenge - so please remember to use the correct `challenge_id` as specified above.
 
