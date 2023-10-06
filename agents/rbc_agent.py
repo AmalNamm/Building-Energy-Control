@@ -1,6 +1,11 @@
-from citylearn.agents.rbc import BasicRBC
+#from citylearn.agents.rbc import BasicRBC
+from citylearn.agents.rlc import RLC
+#from citylearn.agents.sac import SACRBC
 
-class BasicRBCAgent(BasicRBC):
+
+#class BasicRBCAgent(BasicRBC):
+class BasicRBCAgent(RLC):
+#class BasicRBCAgent(SACRBC):
     """ Can be any subclass of citylearn.agents.base.Agent """
     def __init__(self, env):
         super().__init__(env)
@@ -13,3 +18,4 @@ class BasicRBCAgent(BasicRBC):
     def predict(self, observations):
         """ Just a passthrough, can implement any custom logic as needed """
         return super().predict(observations) 
+    #hello

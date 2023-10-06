@@ -1,0 +1,24 @@
+    1  git clone http://gitlab.aicrowd.com/amalnammouchi/citylearn-2023-starter-kit.git
+    2  ls
+    3  cd citylearn-2023-starter-kit/
+    4  ls
+    5  git branch
+    6  git branch neurips_amal
+    7  git branch
+    8  git checkout neurips_amal
+    9  git branch
+   10  cd agents/
+   11  ls
+   12  git add rbc_agent.py 
+   13  git commit -m "changes to rbc_agent"
+   14  git config --global user.email amal.nammouchi@kau.se
+   15  git commit -m "changes to rbc_agent"
+   16  git config --global user.name Amal
+   17  git commit -m "changes to rbc_agent"
+   18  git push 
+   19  git push --set-upstream origin neurips_amal
+   20  history > history.txt
+
+
+
+git add * (add everything)
