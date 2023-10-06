@@ -1,8 +1,7 @@
 {
       "challenge_id" : "control-track-citylearn-challenge",
       "grader_id": "control-track-citylearn-challenge",
-      "authors" : ["amalnammouchi"],
+      "authors" : ["AmalKau"],
       "description" : "Control Track: CityLearn Challenge Agent",
       "debug" : false
-}
-
+    }

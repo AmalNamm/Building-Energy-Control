@@ -7,3 +7,5 @@ class ComfortRewardFunction(ComfortReward):
     
     def calculate(self, observations):
         return super().calculate(observations)
+    
+    

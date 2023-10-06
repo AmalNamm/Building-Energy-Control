@@ -1,7 +1,7 @@
 import numpy as np
 import time
 import os
-
+import pandas as pd
 from citylearn.citylearn import CityLearnEnv
 
 """
@@ -67,6 +67,11 @@ def evaluate(config):
     
     env, wrapper_env = create_citylearn_env(config, SubmissionReward)
     print("Env Created")
+    print('Current time step:', env.time_step)
+    print('environment number of time steps:', env.time_steps)
+    print('environment uses central agent:', env.central_agent)
+    print('Common (shared) observations amogst buildings:', env.shared_observations)
+    print('Number of buildings:', len(env.buildings))
 
     agent = SubmissionAgent(wrapper_env)
 
@@ -132,6 +137,8 @@ if __name__ == '__main__':
         data_dir = './data/'
         SCHEMA = os.path.join(data_dir, 'schemas/warm_up/schema.json')
         num_episodes = 1
+        
+        
     
     config = Config()
 
