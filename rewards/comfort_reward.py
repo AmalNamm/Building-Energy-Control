@@ -1,7 +1,10 @@
 #from citylearn.reward_function import ComfortReward
 from citylearn.reward_function import IndependentSACReward
+from citylearn.reward_function import SolarPenaltyAndComfortReward
+ 
 #class ComfortRewardFunction(ComfortReward):
-class ComfortRewardFunction(IndependentSACReward):
+#class ComfortRewardFunction(IndependentSACReward):
+class ComfortRewardFunction(SolarPenaltyAndComfortReward):
 
     """ Simple passthrough example of comfort reward from Citylearn env """
     def __init__(self, env_metadata):
