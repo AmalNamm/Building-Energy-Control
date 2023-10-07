@@ -1,11 +1,12 @@
-from citylearn.agents.rbc import BasicRBC
+#from citylearn.agents.rbc import BasicRBC
 #from citylearn.agents.rlc import RLC
-#from citylearn.agents.sac import SACRBC
+from citylearn.agents.sac import SAC
+#from citylearn.agents.q_learning import TabularQLearning
 
-
-class BasicRBCAgent(BasicRBC):
+#class BasicRBCAgent(BasicRBC):
 #class BasicRBCAgent(RLC):
 #class BasicRBCAgent(SACRBC):
+class BasicRBCAgent(SAC):
     """ Can be any subclass of citylearn.agents.base.Agent """
     def __init__(self, env):
         super().__init__(env)

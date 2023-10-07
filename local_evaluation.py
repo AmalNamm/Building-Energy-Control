@@ -33,7 +33,7 @@ class WrapperEnv:
         return {'buildings': self.buildings_metadata}
 
 def create_citylearn_env(config, reward_function):
-    env = CityLearnEnv(config.SCHEMA, reward_function=reward_function)
+    env = CityLearnEnv(config.SCHEMA, reward_function=reward_function,central_agent=False)
 
     env_data = dict(
         observation_names = env.observation_names,
@@ -136,7 +136,7 @@ if __name__ == '__main__':
     class Config:
         data_dir = './data/'
         SCHEMA = os.path.join(data_dir, 'schemas/warm_up/schema.json')
-        num_episodes = 10
+        num_episodes = 1
         
         
     
