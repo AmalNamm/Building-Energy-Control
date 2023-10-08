@@ -58,7 +58,7 @@ class RewardFunction:
 
         return reward
     
-class ComfortReward(RewardFunction):
+class ComfortRewardFunction(RewardFunction):
     """Reward for occupant thermal comfort satisfaction.
 
     The reward is the calculated as the negative delta between the setpoint and indoor dry-bulb temperature raised to some exponent
@@ -112,7 +112,7 @@ class ComfortReward(RewardFunction):
 
     def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
         reward_list = []
-"""
+
         for o in observations:
             heating_demand = o.get('heating_demand', 0.0)
             cooling_demand = o.get('cooling_demand', 0.0)
@@ -128,10 +128,10 @@ class ComfortReward(RewardFunction):
                 reward = -(delta**exponent)
             
             elif lower_bound_comfortable_indoor_dry_bulb_temperature <= indoor_dry_bulb_temperature < set_point:
-                reward = 0.0 if heating else -delta
+                reward = 0.0 if heating else -delta + 1.0  # +1.0 for being inside the comfort zone
 
             elif set_point <= indoor_dry_bulb_temperature <= upper_bound_comfortable_indoor_dry_bulb_temperature:
-                reward = -delta if heating else 0.0
+                reward = -delta + 1.0 if heating else 0.0 # +1.0 for being inside the comfort zone
 
             else:
                 exponent = self.higher_exponent if heating else self.lower_exponent
@@ -139,42 +139,5 @@ class ComfortReward(RewardFunction):
 
             reward_list.append(reward)
             
-"""
-        def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
-    reward_list = []
 
-    for o in observations:
-        # ... [rest of the method remains unchanged]
-        heating_demand = o.get('heating_demand', 0.0)
-        cooling_demand = o.get('cooling_demand', 0.0)
-        heating = heating_demand > cooling_demand
-        indoor_dry_bulb_temperature = o['indoor_dry_bulb_temperature']
-        set_point = o['indoor_dry_bulb_temperature_set_point']
-        lower_bound_comfortable_indoor_dry_bulb_temperature = set_point - self.band
-        upper_bound_comfortable_indoor_dry_bulb_temperature = set_point + self.band
-        delta = abs(indoor_dry_bulb_temperature - set_point)
         
-        if indoor_dry_bulb_temperature < lower_bound_comfortable_indoor_dry_bulb_temperature:
-            exponent = self.lower_exponent if heating else self.higher_exponent
-            reward = -(delta**exponent)
-        
-        elif lower_bound_comfortable_indoor_dry_bulb_temperature <= indoor_dry_bulb_temperature < set_point:
-            reward = 0.0 if heating else -delta + 1.0  # +1.0 for being inside the comfort zone
-
-        elif set_point <= indoor_dry_bulb_temperature <= upper_bound_comfortable_indoor_dry_bulb_temperature:
-            reward = -delta + 1.0 if heating else 0.0  # +1.0 for being inside the comfort zone
-
-        else:
-            exponent = self.higher_exponent if heating else self.lower_exponent
-            reward = -(delta**exponent)
-
-        reward_list.append(reward)
-        
-
-        if self.central_agent:
-            reward = [sum(reward_list)]
-
-        else:
-            reward = reward_list
-
-        return reward
