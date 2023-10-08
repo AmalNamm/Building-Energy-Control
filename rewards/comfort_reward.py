@@ -109,9 +109,14 @@ class ComfortRewardFunction(RewardFunction):
     @higher_exponent.setter
     def higher_exponent(self, higher_exponent: float):
         self.__higher_exponent = 3.0 if higher_exponent is None else higher_exponent
+        
+        
 
     def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
         reward_list = []
+        
+        # Get the electricity consumption-based reward from the base class
+        comfort_reward = super().calculate(observations)
 
         for o in observations:
             heating_demand = o.get('heating_demand', 0.0)
@@ -136,8 +141,18 @@ class ComfortRewardFunction(RewardFunction):
             else:
                 exponent = self.higher_exponent if heating else self.lower_exponent
                 reward = -(delta**exponent)
-
+                
             reward_list.append(reward)
+        
+        alpha = 0.65
+                
+        if self.central_agent:
+            final_reward = [alpha * comfort_reward[0] + (1-alpha) * sum(reward_list)]
+        else:
+            final_reward = [alpha * cr + (1-alpha) * rl for cr, rl in zip(comfort_reward, reward_list)]
+        return final_reward
+
+        
             
 
         
