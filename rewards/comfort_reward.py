@@ -133,10 +133,10 @@ class ComfortRewardFunction(RewardFunction):
                 reward = -(delta**exponent)
             
             elif lower_bound_comfortable_indoor_dry_bulb_temperature <= indoor_dry_bulb_temperature < set_point:
-                reward = 0.0 if heating else -delta + 1.0  # +1.0 for being inside the comfort zone
+                reward = 0.0 #if heating else -delta + 1.0  # +1.0 for being inside the comfort zone
 
             elif set_point <= indoor_dry_bulb_temperature <= upper_bound_comfortable_indoor_dry_bulb_temperature:
-                reward = -delta + 1.0 if heating else 0.0 # +1.0 for being inside the comfort zone
+                reward = -delta #+ 1.0 if heating else 0.0 # +1.0 for being inside the comfort zone
 
             else:
                 exponent = self.higher_exponent if heating else self.lower_exponent
@@ -144,7 +144,7 @@ class ComfortRewardFunction(RewardFunction):
                 
             reward_list.append(reward)
         
-        alpha = 0.65
+        alpha = 0.99
                 
         if self.central_agent:
             final_reward = [alpha * comfort_reward[0] + (1-alpha) * sum(reward_list)]
