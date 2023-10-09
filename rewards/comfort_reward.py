@@ -252,6 +252,7 @@ class SolarPenaltyAndComfortReward(RewardFunction):
         # Peak hours are between 18:00 to 22:00 with 1.5x price.
         # Off-peak hours are all other times with 0.8x price.
         #if 18 <= current_time < 22:
+        #if 16 <= current_time < 19:
         if 16 <= current_time < 19:
             return 1.5
         else:
@@ -259,7 +260,10 @@ class SolarPenaltyAndComfortReward(RewardFunction):
     def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
         # Assume one of the observations contains the current time (e.g., in hours).
         #current_time = observations[0].get('current_time', 12)  # Default to noon if not provided.
-        current_time = observations[0].get('current_time',16) 
+        #current_time = observations['hour'] #for o in observations
+
+        current_time = observations[0].get('hour',16) 
+        #print ("************current time************", current_time)
         time_of_use_multiplier = self.get_time_of_use_multiplier(current_time)
 
         reward = np.array([f.calculate(observations) for f in self.__functions], dtype='float32')
@@ -267,9 +271,10 @@ class SolarPenaltyAndComfortReward(RewardFunction):
         # Apply the multiplier to the reward coming from SolarPenaltyReward
         # Assuming SolarPenaltyReward is the first in the list of functions
         reward[0] = reward[0] * time_of_use_multiplier
-        
+        #print("********reward[0]*******",reward[0])
         reward = reward * np.reshape(self.coefficients, (len(self.coefficients), 1))
         reward = reward.sum(axis=0).tolist()
+        print("********reward*******",reward)
 
         return reward
 
