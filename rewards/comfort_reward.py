@@ -258,7 +258,8 @@ class SolarPenaltyAndComfortReward(RewardFunction):
             return 0.8
     def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
         # Assume one of the observations contains the current time (e.g., in hours).
-        current_time = observations[0].get('current_time', 12)  # Default to noon if not provided.
+        #current_time = observations[0].get('current_time', 12)  # Default to noon if not provided.
+        current_time = observations[0].get('current_time',16) 
         time_of_use_multiplier = self.get_time_of_use_multiplier(current_time)
 
         reward = np.array([f.calculate(observations) for f in self.__functions], dtype='float32')
