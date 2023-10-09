@@ -251,7 +251,8 @@ class SolarPenaltyAndComfortReward(RewardFunction):
         # Simple example: 
         # Peak hours are between 18:00 to 22:00 with 1.5x price.
         # Off-peak hours are all other times with 0.8x price.
-        if 18 <= current_time < 22:
+        #if 18 <= current_time < 22:
+        if 16 <= current_time < 19:
             return 1.5
         else:
             return 0.8
