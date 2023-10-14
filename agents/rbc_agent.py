@@ -7,9 +7,17 @@ from citylearn.agents.sac import SAC
 #class BasicRBCAgent(RLC):
 #class BasicRBCAgent(SACRBC):
 class BasicRBCAgent(SAC):
+    kwargs = {
+    'learning_rate': 0.0003,
+    'buffer_size': 1000000,
+    'learning_starts': 100,
+    'batch_size': 256,
+    'tau': 0.005,
+    'gamma': 0.99,
+    'train_freq': 1,}
     """ Can be any subclass of citylearn.agents.base.Agent """
-    def __init__(self, env):
-        super().__init__(env)
+    def __init__(self, env, **kwargs):
+        super().__init__(env, **kwargs)
 
     def register_reset(self, observations):
         """ Register reset needs the first set of actions after reset """

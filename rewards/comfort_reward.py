@@ -35,7 +35,7 @@ class RewardFunction:
     def env_metadata(self, env_metadata: Mapping[str, Any]):
         self.__env_metadata = env_metadata
 
-    def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
+    #def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
         r"""Calculates reward.
 
         Parameters
@@ -50,15 +50,45 @@ class RewardFunction:
             Reward for transition to current timestep.
         """
 
+        #net_electricity_consumption = [o['net_electricity_consumption'] for o in observations]
+
+        #if self.central_agent:
+        #    reward = [min(sum(net_electricity_consumption)*-1, 0.0)]
+       # else:
+       #     reward = [min(v*-1, 0.0) for v in net_electricity_consumption]
+
+        #return reward
+
+    def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
+        r"""Calculates reward, scaling it to the range [-1, 1]. ( to help with training stability) 
+
+        Parameters
+        ----------
+        observations: List[Mapping[str, Union[int, float]]]
+            List of all building observations at current :py:attr:`citylearn.citylearn.CityLearnEnv.
+            time_step` that are got from calling :py:meth:`citylearn.building.Building.observations`.
+
+        Returns
+        -------
+        reward: List[float]
+            Scaled reward for transition to the current timestep.
+        """
+
         net_electricity_consumption = [o['net_electricity_consumption'] for o in observations]
 
         if self.central_agent:
-            reward = [min(sum(net_electricity_consumption)*-1, 0.0)]
+            total_consumption = sum(net_electricity_consumption)
+            # Ensure the total consumption is not zero to avoid division by zero
+            if total_consumption != 0:
+                reward = [min(total_consumption * -1 / abs(total_consumption), 1.0)]
+            else:
+                reward = [0.0]
         else:
-            reward = [min(v*-1, 0.0) for v in net_electricity_consumption]
+            reward = [min(v * -1 / abs(v), 1.0) for v in net_electricity_consumption]
 
         return reward
-    
+
+        
 class ComfortRewardFunction(RewardFunction):
     """Reward for occupant thermal comfort satisfaction.
 

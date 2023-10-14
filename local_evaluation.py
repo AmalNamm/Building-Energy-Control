@@ -73,7 +73,16 @@ def evaluate(config):
     print('Common (shared) observations amogst buildings:', env.shared_observations)
     print('Number of buildings:', len(env.buildings))
 
-    agent = SubmissionAgent(wrapper_env)
+    kwargs = {
+    'learning_rate': 0.0003,
+    'buffer_size': 1000000,
+    'learning_starts': 100,
+    'batch_size': 256,
+    'tau': 0.005,
+    'gamma': 0.99,
+    'train_freq': 1,}
+    
+    agent = SubmissionAgent(wrapper_env,**kwargs)
 
     observations = env.reset()
 
