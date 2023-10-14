@@ -41,7 +41,7 @@ def create_citylearn_env(config, reward_function):
         observation_space = env.observation_space,
         action_space = env.action_space,
         time_steps = env.time_steps,
-        random_seed = None,
+        random_seed = 1234,
         episode_tracker = None,
         seconds_per_time_step = None,
         buildings_metadata = env.get_metadata()['buildings']

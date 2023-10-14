@@ -85,7 +85,7 @@ class RewardFunction:
         # Define weights for each objective
         weight_energy_consumption = 0.25
         weight_user_comfort = 0.6
-        weight_cost = 0.3
+        weight_cost = 0.25
 
         # Calculate individual objective values
         energy_consumption_objective = sum(net_electricity_consumption)

@@ -206,17 +206,32 @@ class SolarPenaltyReward(RewardFunction):
 
     def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
         reward_list = []
+        
+        
 
         for o, m in zip(observations, self.env_metadata['buildings']):
-            e = o['net_electricity_consumption']
-            cc = m['cooling_storage']['capacity']
-            hc = m['heating_storage']['capacity']
-            dc = m['dhw_storage']['capacity']
-            ec = m['electrical_storage']['capacity']
-            cs = o.get('cooling_storage_soc', 0.0)
-            hs = o.get('heating_storage_soc', 0.0)
-            ds = o.get('dhw_storage_soc', 0.0)
-            es = o.get('electrical_storage_soc', 0.0)
+            e = o['net_electricity_consumption'] #net_electricity_consumption: active observation
+            cc = m['cooling_storage']['capacity'] #cooling_storage : active action
+            hc = m['heating_storage']['capacity'] #heating_storage : non active action
+            dc = m['dhw_storage']['capacity']    #dhw_storage : active action
+            ec = m['electrical_storage']['capacity'] #electrical_storage : active action
+            cs = o.get('cooling_storage_soc', 0.0) #cooling_storage_soc  : non active observation
+            hs = o.get('heating_storage_soc', 0.0)  #heating_storage_soc : non active observation
+            ds = o.get('dhw_storage_soc', 0.0) #dhw_storage_soc :active observation
+            es = o.get('electrical_storage_soc', 0.0) #electrical_storage_soc :active observation
+            
+            solar_gen = o['solar_generation']
+        
+        
+            # Penalize wasted solar energy
+            if solar_gen > 0 and e > 0:
+                reward -= solar_gen
+
+            # Reward optimal use of solar energy
+            if solar_gen > 0 and e <= 0:
+                reward += solar_gen
+            
+            
             reward = 0.0
             reward += -(1.0 + np.sign(e)*cs)*abs(e) if cc > ZERO_DIVISION_PLACEHOLDER else 0.0
             reward += -(1.0 + np.sign(e)*hs)*abs(e) if hc > ZERO_DIVISION_PLACEHOLDER else 0.0
