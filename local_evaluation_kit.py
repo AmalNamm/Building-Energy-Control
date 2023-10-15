@@ -13,8 +13,6 @@ use this script for orchestrating the evaluations.
 """
 
 from agents.user_agent import SubmissionAgent
-from rewards.user_reward import SubmissionReward
-
 class WrapperEnv:
     """
     Env to wrap provide Citylearn Env data without providing full env
@@ -99,14 +97,62 @@ def evaluate(config):
 
 
 
-    #observations = env.reset()
-    #agent.predict(observations)
-    metrics_df = env.evaluate_citylearn_challenge()
-    print(metrics_df)
+    observations = env.reset()
+    #model.predict(observations)
 
+    agent_time_elapsed = 0
 
+    step_start = time.perf_counter()
+    actions = agent.register_reset(observations)
+    agent_time_elapsed += time.perf_counter() - step_start
 
-    #print(f"Total time taken by agent: {agent_time_elapsed}s")
+    episodes_completed = 0
+    num_steps = 0
+    interrupted = False
+    episode_metrics = []
+    try:
+        while True:
+            
+            ### This is only a reference script provided to allow you 
+            ### to do local evaluation. The evaluator **DOES NOT** 
+            ### use this script for orchestrating the evaluations. 
+
+            observations, _, done, _ = env.step(actions)
+            if not done:
+                step_start = time.perf_counter()
+                actions = agent.predict(observations)
+                agent_time_elapsed += time.perf_counter()- step_start
+            else:
+                episodes_completed += 1
+                metrics_df = env.evaluate_citylearn_challenge()
+                episode_metrics.append(metrics_df)
+                print(f"Episode complete: {episodes_completed} | Latest episode metrics: {metrics_df}", )
+                
+                # Optional: Uncomment line below to update power outage random seed 
+                # from what was initially defined in schema
+                #env = update_power_outage_random_seed(env, 90000)
+
+                observations = env.reset()
+
+                step_start = time.perf_counter()
+                actions = agent.predict(observations)
+                agent_time_elapsed += time.perf_counter()- step_start
+            
+            num_steps += 1
+            if num_steps % 1000 == 0:
+                print(f"Num Steps: {num_steps}, Num episodes: {episodes_completed}")
+
+            if episodes_completed >= config.num_episodes:
+                break
+
+    except KeyboardInterrupt:
+        print("========================= Stopping Evaluation =========================")
+        interrupted = True
+    
+    if not interrupted:
+        print("=========================Completed=========================")
+
+    print(f"Total time taken by agent: {agent_time_elapsed}s")
     
 
 if __name__ == '__main__':

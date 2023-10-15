@@ -64,22 +64,38 @@ def train_sac_with_hyperparameters(config, lr, tau, gamma):
 
     
     # Initialize the SAC model with the given hyperparameters
-    sac_model = SAC(wrapper_env,lr=lr, tau=tau, gamma=gamma)
-    
+    #sac_model = SAC(wrapper_env,lr=lr, tau=tau, gamma=gamma)
+    agent = SAC(wrapper_env,lr=lr, tau=tau, gamma=gamma)
     # Train the model on CityLearn
     total_reward = 0
-    num_episodes = 1
+
+    num_episodes = 1 #1000
+
     for episode in range(num_episodes):
         state = env.reset()
         done = False
+
         while not done:
-            action = sac_model.actions(state)
-            next_state, reward, done, _ = citylearn.step(action)
-            sac_model.update(state, action, reward, next_state, done)
+            action = agent.predict([state])
+            next_state, reward, done, _ = env.step(action[0])
+
+            agent.update([state], [action[0]], [reward], [next_state], done)
             state = next_state
-            total_reward += reward
+
+        # Optionally save/checkpoint your model periodically
+        if episode % 100 == 0:
+            torch.save({
+                'model_state_dict': agent.policy_net[0].state_dict(),
+                # ... add any other things you want to save
+            }, f"checkpoint_{episode}.pt")
+
+    # Save the final trained model
+    torch.save({
+        'model_state_dict': agent.policy_net[0].state_dict(),
+        # ... add any other things you want to save
+    }, "final_model.pt")
+
     
-    # Return the total reward or some other performance metric
     return total_reward
 
     

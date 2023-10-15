@@ -1,19 +1,13 @@
+import os
+import torch
+from citylearn.citylearn import CityLearnEnv
+from citylearn.agents.sac import SAC
+from rewards.user_reward import SubmissionReward
+from agents.user_agent import SubmissionAgent
+
 import numpy as np
 import time
-import os
 import pandas as pd
-from citylearn.citylearn import CityLearnEnv
-import torch
-from citylearn.agents.sac import SAC as RLAgent
-
-"""
-This is only a reference script provided to allow you 
-to do local evaluation. The evaluator **DOES NOT** 
-use this script for orchestrating the evaluations. 
-"""
-
-from agents.user_agent import SubmissionAgent
-from rewards.user_reward import SubmissionReward
 
 class WrapperEnv:
     """
@@ -64,59 +58,53 @@ def update_power_outage_random_seed(env: CityLearnEnv, random_seed: int) -> City
 
     return env
 
-def evaluate(config):
-    print("Starting local evaluation")
-    
+
+
+
+def evaluate_trained_model(model_path, config):
+    # Create the environment
     env, wrapper_env = create_citylearn_env(config, SubmissionReward)
-    print("Env Created")
-    print('Current time step:', env.time_step)
-    print('environment number of time steps:', env.time_steps)
-    print('environment uses central agent:', env.central_agent)
-    print('Common (shared) observations amogst buildings:', env.shared_observations)
-    print('Number of buildings:', len(env.buildings))
 
-    #kwargs = {
-    #'learning_rate': 0.0003,
-    #'buffer_size': 1000000,
-    #'learning_starts': 100,
-    #'batch_size': 256,
-    #'tau': 0.005,
-    #'gamma': 0.99,
-    #'train_freq': 1,}
+    # Load the trained SAC agent
+    #agent = SAC(env)  # Initialize with the environment
+    agent = SubmissionAgent(wrapper_env)
+    checkpoint = torch.load(model_path)
+    agent.policy_net[0].load_state_dict(checkpoint['model_state_dict'])
     
-    #agent = SubmissionAgent(wrapper_env,**kwargs)
-    #agent = SubmissionAgent(wrapper_env)
-    #agent = SubmissionAgent(wrapper_env, model_path="final_model.pt")
-    #agent = SubmissionAgent(env, model_path="final_model.pt")
-    #model_path="final_model.pt"
-    #checkpoint = torch.load(model_path)
-    #agent.policy_net[0].load_state_dict(checkpoint['model_state_dict'])
-    #agent.policy_net[0].eval()
-    
-    agent = RLAgent(env)
-    
-    agent.learn(episodes=2, deterministic_finish=True)
+    # Ensure the agent is in evaluation mode (important if the agent has components like BatchNorm or Dropout)
+    agent.policy_net[0].eval()
+
+    total_reward = 0
+    done = False
+    observations = env.reset()
+
+    while not done:
+        # Use the agent to select an action
+        with torch.no_grad():  # Ensure no gradients are computed during evaluation
+            actions = agent.predict(observations)
+        
+        # Step the environment
+        observations, reward, done, _ = env.step(actions)
+        #total_reward += reward
+        #observations, reward, done, _ = env.step(actions)
+        reward = sum(reward) if isinstance(reward, list) else reward
+        total_reward += reward
 
 
-
-    #observations = env.reset()
-    #agent.predict(observations)
+    # Compute and print metrics after evaluation
     metrics_df = env.evaluate_citylearn_challenge()
-    print(metrics_df)
+    print("Evaluation Metrics:", metrics_df)
+    print(f"Total reward obtained: {total_reward}")
 
-
-
-    #print(f"Total time taken by agent: {agent_time_elapsed}s")
-    
+    return metrics_df, total_reward
 
 if __name__ == '__main__':
     class Config:
         data_dir = './data/'
         SCHEMA = os.path.join(data_dir, 'schemas/warm_up/schema.json')
-        num_episodes = 1
-        
-        
     
     config = Config()
+    model_path = "final_model.pt"  # The path to your saved model
+    evaluate_trained_model(model_path, config)
+    
 
-    evaluate(config)

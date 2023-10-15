@@ -266,6 +266,10 @@ class SAC(RLC):
                     pass
 
         return encoders
+    def register_reset(self, observations):
+        """ Register reset needs the first set of actions after reset """
+        self.reset()
+        return self.predict(observations)
 
 class SACRBC(SAC):
     r"""Uses :py:class:`citylearn.agents.rbc.RBC` to select action during exploration before using :py:class:`citylearn.agents.sac.SAC`.

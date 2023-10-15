@@ -1,19 +1,27 @@
+from citylearn.agents.sac import SAC as RLAgent
+from citylearn.citylearn import CityLearnEnv, EvaluationCondition
+
+dataset_name = 'citylearn_challenge_2022_phase_1'
+env = CityLearnEnv(dataset_name, central_agent=False, simulation_end_time_step=1000)
+model = RLAgent(env)
+model.learn(episodes=2, deterministic_finish=True)
+
+# print cost functions at the end of episode
+kpis = model.env.evaluate(baseline_condition=EvaluationCondition.WITHOUT_STORAGE_BUT_WITH_PARTIAL_LOAD_AND_PV)
+kpis = kpis.pivot(index='cost_function', columns='name', values='value')
+kpis = kpis.dropna(how='all')
+
+
+
+from agents.SACmodel import SAC
+import random
 import numpy as np
 import time
 import os
 import pandas as pd
 from citylearn.citylearn import CityLearnEnv
-import torch
-from citylearn.agents.sac import SAC as RLAgent
-
-"""
-This is only a reference script provided to allow you 
-to do local evaluation. The evaluator **DOES NOT** 
-use this script for orchestrating the evaluations. 
-"""
-
-from agents.user_agent import SubmissionAgent
 from rewards.user_reward import SubmissionReward
+
 
 class WrapperEnv:
     """
@@ -43,7 +51,7 @@ def create_citylearn_env(config, reward_function):
         observation_space = env.observation_space,
         action_space = env.action_space,
         time_steps = env.time_steps,
-        random_seed = 1234,
+        random_seed = None,
         episode_tracker = None,
         seconds_per_time_step = None,
         buildings_metadata = env.get_metadata()['buildings']
@@ -64,50 +72,28 @@ def update_power_outage_random_seed(env: CityLearnEnv, random_seed: int) -> City
 
     return env
 
-def evaluate(config):
-    print("Starting local evaluation")
+def train_sac_with_hyperparameters(config, lr, tau, gamma):
     
     env, wrapper_env = create_citylearn_env(config, SubmissionReward)
-    print("Env Created")
-    print('Current time step:', env.time_step)
-    print('environment number of time steps:', env.time_steps)
-    print('environment uses central agent:', env.central_agent)
-    print('Common (shared) observations amogst buildings:', env.shared_observations)
-    print('Number of buildings:', len(env.buildings))
 
-    #kwargs = {
-    #'learning_rate': 0.0003,
-    #'buffer_size': 1000000,
-    #'learning_starts': 100,
-    #'batch_size': 256,
-    #'tau': 0.005,
-    #'gamma': 0.99,
-    #'train_freq': 1,}
     
-    #agent = SubmissionAgent(wrapper_env,**kwargs)
-    #agent = SubmissionAgent(wrapper_env)
-    #agent = SubmissionAgent(wrapper_env, model_path="final_model.pt")
-    #agent = SubmissionAgent(env, model_path="final_model.pt")
-    #model_path="final_model.pt"
-    #checkpoint = torch.load(model_path)
-    #agent.policy_net[0].load_state_dict(checkpoint['model_state_dict'])
-    #agent.policy_net[0].eval()
+    # Initialize the SAC model with the given hyperparameters
+    #sac_model = SAC(wrapper_env,lr=lr, tau=tau, gamma=gamma)
     
-    agent = RLAgent(env)
+    model = RLAgent(env)
+    model.learn(episodes=1, deterministic_finish=True)
+    # Save the trained model
+    #model.save("sac_model")
+    #print(type(model))
+    #print(dir(model))
+
     
-    agent.learn(episodes=2, deterministic_finish=True)
 
 
 
-    #observations = env.reset()
-    #agent.predict(observations)
-    metrics_df = env.evaluate_citylearn_challenge()
-    print(metrics_df)
+#print(f"Best Hyperparameters: {best_hyperparameters} with reward: {best_reward}")
 
 
-
-    #print(f"Total time taken by agent: {agent_time_elapsed}s")
-    
 
 if __name__ == '__main__':
     class Config:
@@ -116,7 +102,15 @@ if __name__ == '__main__':
         num_episodes = 1
         
         
+        
+        
     
     config = Config()
+    
+    # Train SAC with selected hyperparameters
+    lr = 0.01
+    tau = 0.01
+    gamma = 0.95
+    reward = train_sac_with_hyperparameters(config,lr, tau, gamma)  # Define this function to train SAC and return reward
 
-    evaluate(config)
+    #evaluate(config)

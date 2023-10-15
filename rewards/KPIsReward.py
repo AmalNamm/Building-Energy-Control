@@ -217,7 +217,7 @@ class RewardFunction:
                 reward += solar_gen
             
             
-            reward = 0.0
+            #reward = 0.0
             reward += -(1.0 + np.sign(e)*cs)*abs(e) if cc > ZERO_DIVISION_PLACEHOLDER else 0.0
             reward += -(1.0 + np.sign(e)*hs)*abs(e) if hc > ZERO_DIVISION_PLACEHOLDER else 0.0
             reward += -(1.0 + np.sign(e)*ds)*abs(e) if dc > ZERO_DIVISION_PLACEHOLDER else 0.0
@@ -225,6 +225,23 @@ class RewardFunction:
             
             # 4. Thermal Resilience
             thermal_resilience = 1 - normalized_discomfort
+            
+            # 3. Ramping, Load Factor, Daily Peak, and All-time Peak
+        # Placeholders for now; these will be more intricate and may require historical data
+            ramping = 0.5  # Placeholder
+            load_factor = 0.5  # Placeholder
+            daily_peak = 0.5  # Placeholder
+            annual_peak = 0.5  # Placeholder
+            
+            reward = (0.1 * normalized_carbon_emissions) - \
+                 (0.3 * normalized_discomfort) + \
+                 (0.075 * ramping) + \
+                 (0.075 * load_factor) - \
+                 (0.075 * daily_peak) - \
+                 (0.075 * annual_peak) + \
+                 (0.15 * thermal_resilience) 
+            #- \
+                 # (0.15 * normalized_unserved_energy)
 
             
             reward_list.append(reward)
