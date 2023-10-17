@@ -95,7 +95,9 @@ def evaluate(config):
     
     agent = RLAgent(env)
     
+    #agent.learn(episodes=2, deterministic_finish=True)
     agent.learn(episodes=2, deterministic_finish=True)
+
 
 
 

@@ -1,3 +1,4 @@
 CityLearn==2.1b9
 numpy
 wandb
+lightgbm
