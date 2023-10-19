@@ -4,9 +4,11 @@ from torch.distributions.normal import Normal
 
 class TGeLU(nn.Module):
     def __init__(self, tl, tr, device = 'cuda', inplace:bool = False):
+    #def __init__(self, tl, tr, device , inplace:bool = False):
         super(TGeLU, self).__init__()
         self.inplace = inplace
-        self.device = device
+        #self.device = device
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.tr = torch.tensor(tr).to(self.device)
         self.tl = torch.tensor(tl).to(self.device)
          
