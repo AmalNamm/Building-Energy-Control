@@ -93,10 +93,10 @@ def evaluate(config):
     #agent.policy_net[0].load_state_dict(checkpoint['model_state_dict'])
     #agent.policy_net[0].eval()
     
-    agent = RLAgent(env)
+    #agent = RLAgent(env)
     
     #agent.learn(episodes=2, deterministic_finish=True)
-    agent.learn(episodes=2, deterministic_finish=True)
+    #agent.learn(episodes=2, deterministic_finish=True)
 
 
 

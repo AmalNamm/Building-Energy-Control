@@ -13,6 +13,8 @@ use this script for orchestrating the evaluations.
 """
 
 from agents.user_agent import SubmissionAgent
+from rewards.user_reward import SubmissionReward
+
 class WrapperEnv:
     """
     Env to wrap provide Citylearn Env data without providing full env
@@ -84,16 +86,17 @@ def evaluate(config):
     
     #agent = SubmissionAgent(wrapper_env,**kwargs)
     #agent = SubmissionAgent(wrapper_env)
-    #agent = SubmissionAgent(wrapper_env, model_path="final_model.pt")
+    agent = SubmissionAgent(wrapper_env, model_path="./agents/final_model.pt")
     #agent = SubmissionAgent(env, model_path="final_model.pt")
     #model_path="final_model.pt"
     #checkpoint = torch.load(model_path)
     #agent.policy_net[0].load_state_dict(checkpoint['model_state_dict'])
     #agent.policy_net[0].eval()
     
-    agent = RLAgent(env)
+    #agent = RLAgent(env)
     
-    agent.learn(episodes=2, deterministic_finish=True)
+    #agent.learn(episodes=2, deterministic_finish=True)
+    
 
 
 

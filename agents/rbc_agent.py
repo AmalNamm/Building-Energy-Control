@@ -25,7 +25,7 @@ class BasicRBCAgent(SAC):
     #def __init__(self, env, **kwargs):
     #    super().__init__(env, **kwargs)
         
-    def __init__(self, env, model_path=None, **kwargs):
+    def __init__(self, env, model_path="final_model.pt", **kwargs):
         super().__init__(env, **kwargs)
         if model_path:
             checkpoint = torch.load(model_path)
