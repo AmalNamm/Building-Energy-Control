@@ -85,8 +85,8 @@ def evaluate(config):
     #'train_freq': 1,}
     
     #agent = SubmissionAgent(wrapper_env,**kwargs)
-    #agent = SubmissionAgent(wrapper_env)
-    agent = SubmissionAgent(wrapper_env, model_path="./agents/final_model.pt")
+    agent = SubmissionAgent(wrapper_env)
+    #agent = SubmissionAgent(wrapper_env, model_path="./agents/final_model_2.pt")
     #agent = SubmissionAgent(env, model_path="final_model.pt")
     #model_path="final_model.pt"
     #checkpoint = torch.load(model_path)

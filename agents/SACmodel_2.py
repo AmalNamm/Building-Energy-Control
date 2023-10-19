@@ -14,10 +14,10 @@ from citylearn.agents.rlc import RLC
 from citylearn.citylearn import CityLearnEnv
 from citylearn.preprocessing import Encoder, RemoveFeature
 #from citylearn.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
-from rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
+from agents.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 #from rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 
-class SAC(RLC):
+class SAC_TGELU(RLC):
     def __init__(self, env: CityLearnEnv, **kwargs: Any):
         r"""Custom soft actor-critic algorithm.
 
@@ -41,8 +41,8 @@ class SAC(RLC):
         self.replay_buffer = [ReplayBuffer(int(self.replay_buffer_capacity)) for _ in self.action_space]
         self.soft_q_net1 = [None for _ in self.action_space]
         self.soft_q_net2 = [None for _ in self.action_space]
-        #self.target_soft_q_net1 = [None for _ in self.action_space]
-        #self.target_soft_q_net2 = [None for _ in self.action_space]
+        self.target_soft_q_net1 = [None for _ in self.action_space]
+        self.target_soft_q_net2 = [None for _ in self.action_space]
         self.policy_net = [None for _ in self.action_space]
         self.soft_q_optimizer1 = [None for _ in self.action_space]
         self.soft_q_optimizer2 = [None for _ in self.action_space]
@@ -124,11 +124,11 @@ class SAC(RLC):
                         new_next_actions, new_log_pi, _ = self.policy_net[i].sample(n)
 
                         # The updated Q-value is found by subtracting the logprob of the sampled action (proportional to the entropy) to the Q-values estimated by the target networks.
-                        next_q_values = torch.min(
-                            self.soft_q_net1[i](n, new_next_actions),
-                            self.soft_q_net2[i](n, new_next_actions),
+                        target_q_values = torch.min(
+                            self.target_soft_q_net1[i](n, new_next_actions),
+                            self.target_soft_q_net2[i](n, new_next_actions),
                         ) - self.alpha*new_log_pi
-                        q_target = r + (1 - d)*self.discount*next_q_values
+                        q_target = r + (1 - d)*self.discount*target_q_values
 
                     # Update Soft Q-Networks
                     q1_pred = self.soft_q_net1[i](o, a)
@@ -154,11 +154,11 @@ class SAC(RLC):
                     self.policy_optimizer[i].step()
 
                     # Soft Updates
-                   # for target_param, param in zip(self.target_soft_q_net1[i].parameters(), self.soft_q_net1[i].parameters()):
-                   #     target_param.data.copy_(target_param.data*(1.0 - self.tau) + param.data*self.tau)
+                    for target_param, param in zip(self.target_soft_q_net1[i].parameters(), self.soft_q_net1[i].parameters()):
+                        target_param.data.copy_(target_param.data*(1.0 - self.tau) + param.data*self.tau)
 
-                  #  for target_param, param in zip(self.target_soft_q_net2[i].parameters(), self.soft_q_net2[i].parameters()):
-                    #    target_param.data.copy_(target_param.data*(1.0 - self.tau) + param.data*self.tau)
+                    for target_param, param in zip(self.target_soft_q_net2[i].parameters(), self.soft_q_net2[i].parameters()):
+                        target_param.data.copy_(target_param.data*(1.0 - self.tau) + param.data*self.tau)
 
             else:
                 pass
@@ -240,14 +240,14 @@ class SAC(RLC):
             # init networks
             self.soft_q_net1[i] = SoftQNetwork(observation_dimension, self.action_dimension[i], self.hidden_dimension).to(self.device)
             self.soft_q_net2[i] = SoftQNetwork(observation_dimension, self.action_dimension[i], self.hidden_dimension).to(self.device)
-            #self.target_soft_q_net1[i] = SoftQNetwork(observation_dimension, self.action_dimension[i], self.hidden_dimension).to(self.device)
-            #self.target_soft_q_net2[i] = SoftQNetwork(observation_dimension, self.action_dimension[i], self.hidden_dimension).to(self.device)
+            self.target_soft_q_net1[i] = SoftQNetwork(observation_dimension, self.action_dimension[i], self.hidden_dimension).to(self.device)
+            self.target_soft_q_net2[i] = SoftQNetwork(observation_dimension, self.action_dimension[i], self.hidden_dimension).to(self.device)
 
-           # for target_param, param in zip(self.target_soft_q_net1[i].parameters(), self.soft_q_net1[i].parameters()):
-             #   target_param.data.copy_(param.data)
+            for target_param, param in zip(self.target_soft_q_net1[i].parameters(), self.soft_q_net1[i].parameters()):
+                target_param.data.copy_(param.data)
 
-            #for target_param, param in zip(self.target_soft_q_net2[i].parameters(), self.soft_q_net2[i].parameters()):
-             #   target_param.data.copy_(param.data)
+            for target_param, param in zip(self.target_soft_q_net2[i].parameters(), self.soft_q_net2[i].parameters()):
+                target_param.data.copy_(param.data)
 
             # Policy
             self.policy_net[i] = PolicyNetwork(observation_dimension, self.action_dimension[i], self.action_space[i], self.action_scaling_coefficient, self.hidden_dimension).to(self.device)
@@ -273,45 +273,3 @@ class SAC(RLC):
         self.reset()
         return self.predict(observations)
 
-class SACRBC(SAC):
-    r"""Uses :py:class:`citylearn.agents.rbc.RBC` to select action during exploration before using :py:class:`citylearn.agents.sac.SAC`.
-
-    Parameters
-    ----------
-    env: CityLearnEnv
-        CityLearn environment.
-    rbc: RBC
-        :py:class:`citylearn.agents.rbc.RBC` or child class, used to select actions during exploration.
-    
-    Other Parameters
-    ----------------
-    **kwargs : Any
-        Other keyword arguments used to initialize super class.
-    """
-    
-    def __init__(self, env: CityLearnEnv, rbc: RBC = None, **kwargs: Any):
-        super().__init__(env, **kwargs)
-        self.__set_rbc(rbc, **kwargs)
-
-    @property
-    def rbc(self) -> RBC:
-        """:py:class:`citylearn.agents.rbc.RBC` or child class, used to select actions during exploration."""
-
-        return self.__rbc
-    
-    def __set_rbc(self, rbc: RBC, **kwargs):
-        if rbc is None:
-            rbc = RBC(self.env, **kwargs)
-        
-        elif isinstance(rbc, RBC):
-            pass
-
-        else:
-            rbc = rbc(self.env, **kwargs)
-        
-        self.__rbc = rbc
-
-    def get_exploration_prediction(self, observations: List[float]) -> List[float]:
-        """Return actions using :class:`RBC`."""
-
-        return self.rbc.predict(observations)
