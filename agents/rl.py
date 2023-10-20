@@ -117,6 +117,7 @@ class RegressionBuffer:
 class SoftQNetwork(nn.Module):
     def __init__(self, num_inputs, num_actions, hidden_size=[400,300], init_w=3e-3):
         super(SoftQNetwork, self).__init__()
+        self.act_func = TGeLU(tl=-1,tr=-1)
         
         self.linear1 = nn.Linear(num_inputs + num_actions, hidden_size[0])
         self.linear2 = nn.Linear(hidden_size[0], hidden_size[1])

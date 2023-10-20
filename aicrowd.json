@@ -2,6 +2,7 @@
       "challenge_id" : "control-track-citylearn-challenge",
       
       "authors" : ["AmalKau"],
+      "central agent" : false, 
       "description" : "Control Track: CityLearn Challenge Agent",
       "debug" : false
     }

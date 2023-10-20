@@ -20,7 +20,8 @@ class TGeLU(nn.Module):
         cond2 = (0<=input)*(input<self.tr)
         cond3 = (self.tl<=input)*(input<0)
         cond4 = (input<self.tl)
-        
+        #print(input - self.tr)
+
         term1 = self.tr*dist.cdf(self.tr) + (input-self.tr)*(1-dist.cdf(input-self.tr))
         term2 = input*dist.cdf(input)
         term3 = input*(1-dist.cdf(input))

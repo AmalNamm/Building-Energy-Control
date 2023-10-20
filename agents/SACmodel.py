@@ -14,10 +14,10 @@ from citylearn.agents.rlc import RLC
 from citylearn.citylearn import CityLearnEnv
 from citylearn.preprocessing import Encoder, RemoveFeature
 #from citylearn.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
-from rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
+from agents.rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 #from rl import PolicyNetwork, ReplayBuffer, SoftQNetwork
 
-class SAC(RLC):
+class SAC_TGELU_WithoutTarget(RLC):
     def __init__(self, env: CityLearnEnv, **kwargs: Any):
         r"""Custom soft actor-critic algorithm.
 
@@ -91,7 +91,7 @@ class SAC(RLC):
                 if not self.normalized[i]:
                     # calculate normalized observations and rewards
                     X = np.array([j[0] for j in self.replay_buffer[i].buffer], dtype = float)
-                    self.norm_mean[i] = np.nanmean(X, axis=0)
+                    self.norm_mean[i] = np.nanmean(X, axis=0) + 1e-5
                     self.norm_std[i] = np.nanstd(X, axis=0) + 1e-5
                     R = np.array([j[2] for j in self.replay_buffer[i].buffer], dtype = float)
                     self.r_norm_mean[i] = np.nanmean(R, dtype = float)
@@ -273,45 +273,3 @@ class SAC(RLC):
         self.reset()
         return self.predict(observations)
 
-class SACRBC(SAC):
-    r"""Uses :py:class:`citylearn.agents.rbc.RBC` to select action during exploration before using :py:class:`citylearn.agents.sac.SAC`.
-
-    Parameters
-    ----------
-    env: CityLearnEnv
-        CityLearn environment.
-    rbc: RBC
-        :py:class:`citylearn.agents.rbc.RBC` or child class, used to select actions during exploration.
-    
-    Other Parameters
-    ----------------
-    **kwargs : Any
-        Other keyword arguments used to initialize super class.
-    """
-    
-    def __init__(self, env: CityLearnEnv, rbc: RBC = None, **kwargs: Any):
-        super().__init__(env, **kwargs)
-        self.__set_rbc(rbc, **kwargs)
-
-    @property
-    def rbc(self) -> RBC:
-        """:py:class:`citylearn.agents.rbc.RBC` or child class, used to select actions during exploration."""
-
-        return self.__rbc
-    
-    def __set_rbc(self, rbc: RBC, **kwargs):
-        if rbc is None:
-            rbc = RBC(self.env, **kwargs)
-        
-        elif isinstance(rbc, RBC):
-            pass
-
-        else:
-            rbc = rbc(self.env, **kwargs)
-        
-        self.__rbc = rbc
-
-    def get_exploration_prediction(self, observations: List[float]) -> List[float]:
-        """Return actions using :class:`RBC`."""
-
-        return self.rbc.predict(observations)
