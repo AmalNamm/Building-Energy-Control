@@ -1,8 +1,8 @@
-from rewards.comfort_reward import ComfortRewardFunction
-from rewards.comfort_reward import SolarPenaltyAndComfortReward
+#from rewards.comfort_reward import ComfortRewardFunction
+#from rewards.comfort_reward import SolarPenaltyAndComfortReward
 #from rewards.CustomReward import RewardFunction
-from rewards.KPIsReward import RewardFunction
-
+#from rewards.KPIsReward import RewardFunction
+from rewards.reward_function import IndependentSACReward
 ###################################################################
 #####                Specify your reward here                 #####
 ###################################################################
@@ -11,4 +11,6 @@ from rewards.KPIsReward import RewardFunction
 
 #SubmissionReward = SolarPenaltyAndComfortReward
 
-SubmissionReward = RewardFunction
+#SubmissionReward = RewardFunction
+
+SubmissionReward = IndependentSACReward
