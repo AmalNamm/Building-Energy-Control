@@ -132,15 +132,15 @@ class SolarPenaltyReward(RewardFunction):
         reward_list = []
 
         for o, m in zip(observations, self.env_metadata['buildings']):
-            e = o['net_electricity_consumption']
-            cc = m['cooling_storage']['capacity']
-            hc = m['heating_storage']['capacity']
-            dc = m['dhw_storage']['capacity']
-            ec = m['electrical_storage']['capacity']
-            cs = o.get('cooling_storage_soc', 0.0)
-            hs = o.get('heating_storage_soc', 0.0)
-            ds = o.get('dhw_storage_soc', 0.0)
-            es = o.get('electrical_storage_soc', 0.0)
+            e = o['net_electricity_consumption'] #Get the observation net_electricity_consumption
+            cc = m['cooling_storage']['capacity'] #inactive action 
+            hc = m['heating_storage']['capacity'] #inactive action
+            dc = m['dhw_storage']['capacity'] #active action
+            ec = m['electrical_storage']['capacity'] #active action
+            cs = o.get('cooling_storage_soc', 0.0) #inactive observation
+            hs = o.get('heating_storage_soc', 0.0) #inactive observation
+            ds = o.get('dhw_storage_soc', 0.0) #"active": true, "shared_in_central_agent": false
+            es = o.get('electrical_storage_soc', 0.0) #"active": true, "shared_in_central_agent": false
             reward = 0.0
             reward += -(1.0 + np.sign(e)*cs)*abs(e) if cc > ZERO_DIVISION_PLACEHOLDER else 0.0
             reward += -(1.0 + np.sign(e)*hs)*abs(e) if hc > ZERO_DIVISION_PLACEHOLDER else 0.0

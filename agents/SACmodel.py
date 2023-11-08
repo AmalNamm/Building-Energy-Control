@@ -5,6 +5,7 @@ import numpy.typing as npt
 try:
     import torch
     import torch.nn as nn
+    from torch.nn.utils import clip_grad_norm_
     import torch.optim as optim
 except (ModuleNotFoundError, ImportError) as e:
     raise Exception("This functionality requires you to install torch. You can install torch by : pip install torch torchvision, or for more detailed instructions please visit https://pytorch.org.")
@@ -137,9 +138,15 @@ class SAC_TGELU_WithoutTarget(RLC):
                     q2_loss = self.soft_q_criterion(q2_pred, q_target)
                     self.soft_q_optimizer1[i].zero_grad()
                     q1_loss.backward()
+                    # Apply gradient clipping to soft_q_net1
+                    #torch.nn.utils.clip_grad_norm_(self.soft_q_net1[i].parameters(), max_norm=0.5)
+
                     self.soft_q_optimizer1[i].step()
                     self.soft_q_optimizer2[i].zero_grad()
                     q2_loss.backward()
+                    # Apply gradient clipping to soft_q_net2
+                    #torch.nn.utils.clip_grad_norm_(self.soft_q_net2[i].parameters(), max_norm=0.5)
+
                     self.soft_q_optimizer2[i].step()
 
                     # Update Policy
@@ -151,6 +158,8 @@ class SAC_TGELU_WithoutTarget(RLC):
                     policy_loss = (self.alpha*log_pi - q_new_actions).mean()
                     self.policy_optimizer[i].zero_grad()
                     policy_loss.backward()
+                    # Apply gradient clipping to policy_net
+                    torch.nn.utils.clip_grad_norm_(self.policy_net[i].parameters(), max_norm=0.5)
                     self.policy_optimizer[i].step()
 
                     # Soft Updates
