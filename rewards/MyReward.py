@@ -181,9 +181,9 @@ class CombinedRewardFunction(RewardFunction):
         
         # Combine the rewards for each building
         for solar_reward, marl_reward, comfort_reward in zip(solar_rewards, marl_rewards,comfort_rewards):
-            #combined_reward = 0.3*solar_reward + 0.2*marl_reward +0.5*comfort_reward
+            combined_reward = 0.3*solar_reward + 0.2*marl_reward +0.5*comfort_reward
             #combined_reward = 0.3*solar_reward + 0.1*marl_reward + 0.6*comfort_reward
-            combined_reward = solar_reward + marl_reward + 0*comfort_reward
+            #combined_reward = solar_reward + marl_reward + 0*comfort_reward
             combined_rewards.append(combined_reward)
 
         if self.central_agent:

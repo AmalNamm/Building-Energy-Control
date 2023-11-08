@@ -6,8 +6,8 @@ import os
 #from citylearn.agents.q_learning import TabularQLearning
 #from citylearn.agents.sac import SAC as RLAgent
 import torch
-from agents.SACmodel_2 import SAC_TGELU
-from agents.SACmodel import SAC_TGELU_WithoutTarget
+#from agents.SACmodel_2 import SAC_TGELU
+#from agents.SACmodel import SAC_TGELU_WithoutTarget
 
 
 
@@ -15,9 +15,9 @@ from agents.SACmodel import SAC_TGELU_WithoutTarget
 #class BasicRBCAgent(RLC):
 #class BasicRBCAgent(SACRBC):
 #class BasicRBCAgent(SAC_TGELU):
-class BasicRBCAgent(SAC_TGELU_WithoutTarget):
+#class BasicRBCAgent(SAC_TGELU_WithoutTarget):
 #class BasicRBCAgent():
-#class BasicRBCAgent(SAC):
+class BasicRBCAgent(SAC):
 
 
     #kwargs = {
