@@ -1,0 +1,140 @@
+{
+    "os": "Linux-5.15.0-79-generic-x86_64-with-glibc2.35",
+    "python": "3.10.10",
+    "heartbeatAt": "2023-11-13T09:13:23.278787",
+    "startedAt": "2023-11-13T09:13:22.693517",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/amalnamm/work/Neurips_CityLearn/GIT/citylearn-2023-starter-kit/our_sac-Copy1.py",
+    "codePathLocal": "our_sac-Copy1.py",
+    "codePath": "our_sac-Copy1.py",
+    "git": {
+        "remote": "git@gitlab.aicrowd.com:AmalKau/citylearn-2023-starter-kit-my-forked-version.git",
+        "commit": "739fba692f9773585d7a8df70a1f0c5f04c62017"
+    },
+    "email": "73968-AmalKau@users.noreply.gitlab.aicrowd.com",
+    "root": "/home/amalnamm/work/Neurips_CityLearn/GIT/citylearn-2023-starter-kit",
+    "host": "0c3933544d6c",
+    "username": "amalnamm",
+    "executable": "/opt/conda/bin/python",
+    "cpu_count": 10,
+    "cpu_count_logical": 20,
+    "cpu_freq": {
+        "current": 3534.4887000000003,
+        "min": 1200.0,
+        "max": 4420.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3550.559,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3534.3,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3547.006,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3510.335,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3546.264,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3754.557,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3545.607,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3544.452,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3544.41,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3702.681,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3409.603,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4400.0
+        },
+        {
+            "current": 3500.0,
+            "min": 1200.0,
+            "max": 4400.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 914.329216003418,
+            "used": 137.87556838989258
+        }
+    },
+    "memory": {
+        "total": 62.48623275756836
+    }
+}

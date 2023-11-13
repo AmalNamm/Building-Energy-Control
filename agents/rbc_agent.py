@@ -6,7 +6,9 @@ import os
 #from citylearn.agents.q_learning import TabularQLearning
 #from citylearn.agents.sac import SAC as RLAgent
 import torch
-#from agents.SACmodel_2 import SAC_TGELU
+from agents.SACmodel_2 import SAC_TGELU
+#from SACmodel_2 import SAC_TGELU
+
 #from agents.SACmodel import SAC_TGELU_WithoutTarget
 
 
@@ -14,10 +16,10 @@ import torch
 #class BasicRBCAgent(BasicRBC):
 #class BasicRBCAgent(RLC):
 #class BasicRBCAgent(SACRBC):
-#class BasicRBCAgent(SAC_TGELU):
+class BasicRBCAgent(SAC_TGELU):
 #class BasicRBCAgent(SAC_TGELU_WithoutTarget):
 #class BasicRBCAgent():
-class BasicRBCAgent(SAC):
+#class BasicRBCAgent(SAC):
 
 
     #kwargs = {
@@ -34,8 +36,13 @@ class BasicRBCAgent(SAC):
         
     def __init__(self, env, model_path="final_model_50.pt", **kwargs):
         super().__init__(env, **kwargs)
-        #if model_path:
-            #checkpoint = torch.load(model_path)
+        if model_path:
+            checkpoint = torch.load(model_path)
+            
+            for ix in enumerate(env.buildings):
+                
+                self.policy_net[ix].load_state_dict(checkpoint[f'runs/sac-default-False-independent_sac/et2rpsev/policy_net{ix}.pth'])
+                self.policy_net[ix].eval()
             #self.policy_net[0].load_state_dict(checkpoint['model_state_dict_50'])
             #self.policy_net[0].eval()
 
