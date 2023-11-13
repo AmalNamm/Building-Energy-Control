@@ -112,9 +112,9 @@ class CombinedRewardFunction(RewardFunction):
             #cc = m['cooling_storage']['capacity'] #inactive action 
             #hc = m['heating_storage']['capacity'] #inactive action
             dc = m['dhw_storage']['capacity'] #active action
-            print("dc = m['dhw_storage']['capacity']", dc)
+            #print("dc = m['dhw_storage']['capacity']", dc)
             ec = m['electrical_storage']['capacity'] #active action
-            print("ec = m['electrical_storage']['capacity']", ec)
+            #print("ec = m['electrical_storage']['capacity']", ec)
 
             #cs = o.get('cooling_storage_soc', 0.0) #inactive observation
             #hs = o.get('heating_storage_soc', 0.0) #inactive observation
