@@ -16,10 +16,10 @@ from agents.SACmodel_2 import SAC_TGELU
 #class BasicRBCAgent(BasicRBC):
 #class BasicRBCAgent(RLC):
 #class BasicRBCAgent(SACRBC):
-class BasicRBCAgent(SAC_TGELU):
+#class BasicRBCAgent(SAC_TGELU):
 #class BasicRBCAgent(SAC_TGELU_WithoutTarget):
 #class BasicRBCAgent():
-#class BasicRBCAgent(SAC):
+class BasicRBCAgent(SAC):
 
 
     #kwargs = {
@@ -41,10 +41,10 @@ class BasicRBCAgent(SAC_TGELU):
         #if model_path:
             #checkpoint = torch.load(model_path)
             
-        for ix in enumerate(env.buildings):
+        #for ix in enumerate(self.env.buildings):
                 
-            self.policy_net[ix].load_state_dict(checkpoint[f'runs/sac-default-False-independent_sac/et2rpsev/policy_net{ix}.pth'])
-            self.policy_net[ix].eval()
+            #self.policy_net[ix].load_state_dict(checkpoint[f'runs/sac-default-False-independent_sac/et2rpsev/policy_net{ix}.pth'])
+            #self.policy_net[ix].eval()
             #self.policy_net[0].load_state_dict(checkpoint['model_state_dict_50'])
             #self.policy_net[0].eval()
 

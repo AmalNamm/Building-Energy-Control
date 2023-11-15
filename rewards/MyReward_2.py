@@ -1,12 +1,6 @@
-#from typing import List, Mapping, Union, Any
-
-#ZERO_DIVISION_PLACEHOLDER = 0.0001  # This is a placeholder. Define it as per your logic.
-
-#reward functions from citylearn github
 from typing import Any, List, Mapping, Tuple, Union
 import numpy as np
 from citylearn.data import ZERO_DIVISION_PLACEHOLDER
-
 class RewardFunction:
     r"""Base and default reward function class.
 
@@ -101,51 +95,33 @@ class CombinedRewardFunction(RewardFunction):
 
 
     def calculate(self, observations: List[Mapping[str, Union[int, float]]]) -> List[float]:
-        solar_rewards = []  # To store rewards from SolarPenaltyReward
-        marl_rewards = []   # To store rewards from MARL
-        comfort_rewards = [] # To store reward from Confort reward
-        combined_rewards = []  # To store the combined rewards
-
+        
+        comfort_rewards = []  # To store rewards from Confort reward
         # Loop through each building to calculate the SolarPenaltyReward
         for o, m in zip(observations, self.env_metadata['buildings']):
             
-            outage = o['power_outage']
-            e = o['net_electricity_consumption']
-            #cc = m['cooling_storage']['capacity'] #inactive action 
-            #hc = m['heating_storage']['capacity'] #inactive action
+            #Extracting the observations
+            # Extract relevant pieces from the observation
+            indoor_temp = o['indoor_dry_bulb_temperature']
+            temp_set_point = o['indoor_dry_bulb_temperature_set_point']
+            carbon_intensity = o['carbon_intensity']
+            net_electricity_consumption = o['net_electricity_consumption']
+            power_outage = o['power_outage']
+            electricity_price = o['electricity_pricing']
+
+    # Extract the state of charge of energy storage systems
+            dhw_storage_soc = o['dhw_storage_soc']
+            electrical_storage_soc = o['electrical_storage_soc']
+            ec = m['electrical_storage']['capacity']
             dc = m['dhw_storage']['capacity'] #active action
-            #print("dc = m['dhw_storage']['capacity']", dc)
-            ec = m['electrical_storage']['capacity'] #active action
-            #print("ec = m['electrical_storage']['capacity']", ec)
-
-            #cs = o.get('cooling_storage_soc', 0.0) #inactive observation
-            #hs = o.get('heating_storage_soc', 0.0) #inactive observation
-            ds = o.get('dhw_storage_soc', 0.0)  #"active": true, "shared_in_central_agent": false
-            es = o.get('electrical_storage_soc', 0.0)  #"active": true, "shared_in_central_agent": false
-            solar_reward = 0.0
-
-            # Apply similar logic as in SolarPenaltyReward to calculate the solar reward
-            #if cc > ZERO_DIVISION_PLACEHOLDER:
-            #    solar_reward += -(1.0 + np.sign(e) * cs) * abs(e)
-            #if hc > ZERO_DIVISION_PLACEHOLDER:
-                #solar_reward += -(1.0 + np.sign(e) * hs) * abs(e)
-            if dc > ZERO_DIVISION_PLACEHOLDER:
-                solar_reward += -(1.0 + np.sign(e) * ds) * abs(e)*0.01 #scale down the electricity
-            if ec > ZERO_DIVISION_PLACEHOLDER:
-                solar_reward += -(1.0 + np.sign(e) * es) * abs(e)*0.01 #scale down the electricity
-
-            solar_rewards.append(solar_reward)
-            
-            #Loop through each building to calculate the ConfortReward
-            heating_demand = o.get('heating_demand', 0.0)
+            # Components of the reward function
+            cooling = heating_demand < cooling_demand
+            #Confort for cooling/heating
             cooling_demand = o.get('cooling_demand', 0.0)
-            heating = heating_demand > cooling_demand
-            indoor_dry_bulb_temperature = o['indoor_dry_bulb_temperature']
-            set_point = o['indoor_dry_bulb_temperature_set_point']
+            heating_demand = o.get('heating_demand', 0.0)
             lower_bound = set_point - self.band
             upper_bound = set_point + self.band
             delta = abs(indoor_dry_bulb_temperature - set_point)
-            
             # Use the appropriate exponent based on whether the system is heating or cooling
             if indoor_dry_bulb_temperature < lower_bound:
                 exponent = self.higher_exponent if outage else self.lower_exponent
@@ -162,41 +138,43 @@ class CombinedRewardFunction(RewardFunction):
                 comfort_reward = -(delta**exponent)
                 
             comfort_rewards.append(comfort_reward)
+            
+            #
+            MAX_SOC = m['electrical_storage']['capacity']
+            MAX_SOC_dhw = m['dhw_storage']['capacity'] 
+            
+            #Confort for dhw demand
+            dhw_demand = o.get('dhw_demand', 0.0)
+            
+            
 
-        # Calculate MARL components (district-level considerations)
-        district_electricity_consumption = sum(o['net_electricity_consumption'] for o in observations)
-        marl_reward_component = np.sign(district_electricity_consumption) * \
-                                0.01 * district_electricity_consumption ** 2 * \
-                                np.nanmax([0, district_electricity_consumption])
-
-        # MARL rewards, considering individual buildings or a central agent controlling all buildings
-        if self.central_agent:
-            marl_rewards = [marl_reward_component]
-        else:
-            for e in [o['net_electricity_consumption'] for o in observations]:
-                individual_marl_reward = np.sign(e) * 0.01 * e ** 2 * np.nanmax([0, district_electricity_consumption])
-                marl_rewards.append(individual_marl_reward)
-
-                
-                
-        # Combine the rewards for each building
-        #for solar_reward, marl_reward in zip(solar_rewards, marl_rewards):
-        #    combined_reward = 0.4*solar_reward + 0.6*marl_reward
-        #    combined_rewards.append(combined_reward)
-        
-        # Combine the rewards for each building
-        for solar_reward, marl_reward, comfort_reward in zip(solar_rewards, marl_rewards,comfort_rewards):
-            combined_reward = 0.3*solar_reward + 0.2*marl_reward +0.5*comfort_reward #first wandb run 
-            #combined_reward = 0.3*solar_reward + 0.1*marl_reward + 0.6*comfort_reward
-            #combined_reward = solar_reward + marl_reward + comfort_reward
-            combined_rewards.append(combined_reward)
-
-        if self.central_agent:
-            # If there's a central agent, return the sum of combined rewards
-            return [sum(combined_rewards)]
-        else:
-            # Otherwise, return the list of combined rewards
-            return combined_rewards
-        
+            
         
     ######## ADD 20% Battery for all timesteps ##########
+
+def reward_function(observation, action, weight_dict):
+    # Extract relevant pieces from the observation
+    indoor_temp = observation['indoor_dry_bulb_temperature']
+    temp_set_point = observation['indoor_dry_bulb_temperature_set_point']
+    carbon_intensity = observation['carbon_intensity']
+    net_electricity_consumption = observation['net_electricity_consumption']
+    power_outage = observation['power_outage']
+    electricity_price = observation['electricity_pricing']
+
+    # Extract the state of charge of energy storage systems
+    dhw_storage_soc = observation['dhw_storage_soc']
+    electrical_storage_soc = observation['electrical_storage_soc']
+
+    # Components of the reward function
+    comfort_penalty = -abs(indoor_temp - temp_set_point)
+    emission_penalty = -carbon_intensity * net_electricity_consumption
+    cost_penalty = -electricity_price * net_electricity_consumption
+    resilience_reward = (dhw_storage_soc + electrical_storage_soc) * power_outage
+
+    # Weight each part of the reward
+    reward = (weight_dict['comfort_weight'] * comfort_penalty +
+              weight_dict['emission_weight'] * emission_penalty +
+              weight_dict['cost_weight'] * cost_penalty +
+              weight_dict['resilience_weight'] * resilience_reward)
+
+    return reward

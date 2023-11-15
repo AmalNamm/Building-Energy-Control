@@ -165,7 +165,9 @@ if __name__ == '__main__':
 
     parser.add_argument("--agent", type=str, default="sac")
     parser.add_argument("--reward", type=str, default="independent_sac")
-    parser.add_argument("--epochs", type=int, default=50)
+    #parser.add_argument("--epochs", type=int, default=50)
+    parser.add_argument("--epochs", type=int, default=100)
+
     parser.add_argument("--wandb", action="store_true")
     parser.add_argument("--logs_path", type=str, default="runs/")
     parser.add_argument("--seed", type=int, default=0)
